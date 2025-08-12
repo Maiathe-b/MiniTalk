@@ -1,27 +1,29 @@
-NAME= minitalk.a
+CLIENT = client
+SERVER = server
 SRCS= client.c server.c
+LIBFT_DIR = ./libft
+LIBFT = $(LIBFT_DIR)/libft.a
 
-COMP_LIB= ar rcs
-RM= rm -f
 CC= cc
 CC_FLAGS= -Wall -Wextra -Werror
 
-OBJS= $(SRCS:.c=.o)
+all: $(LIBFT) $(CLIENT) $(SERVER)
 
-%.o : %.c
-	$(CC) $(CC_FLAGS) -c $< -o $@
-
-all: $(NAME)
+$(LIBFT):
+	$(MAKE) -C $(LIBFT_DIR)
 
 clean:
-	$(RM) $(OBJS)
+	$(MAKE) -C $(LIBFT_DIR) clean
 
 fclean: clean
-	$(RM) $(NAME)
+	rm -f $(CLIENT) $(SERVER)
 
 re: fclean all
 
-$(NAME): $(OBJS)
-	$(COMP_LIB) $(NAME) $(OBJS)
+$(CLIENT):
+	$(CC)  $(CC_FLAGS) client.c -L$(LIBFT_DIR) -lft -o $(CLIENT)
+
+$(SERVER):
+	$(CC)  $(CC_FLAGS) server.c -L$(LIBFT_DIR) -lft -o $(SERVER)
 
 .PHONY: all clean fclean re

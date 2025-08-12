@@ -6,7 +6,7 @@
 /*   By: jomaia <jomaia@student.42.fr>              +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/08/07 15:09:37 by jomaia            #+#    #+#             */
-/*   Updated: 2025/08/07 16:24:02 by jomaia           ###   ########.fr       */
+/*   Updated: 2025/08/12 18:17:51 by jomaia           ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -20,9 +20,9 @@ static void	send_signal(int pid, unsigned char chr)
 {
 	int	i;
 	int	test;
-	
+
 	i = 8;
-	while(i > 0)
+	while (i > 0)
 	{
 		i--;
 		test = chr >> i;
@@ -48,7 +48,7 @@ int	main(int argc, char **argv)
 	}
 	server_pid = ft_atoi(argv[1]);
 	msg = argv[2];
-	while(msg[i])
+	while (msg[i])
 		send_signal(server_pid, msg[i++]);
 	send_signal(server_pid, '\0');
 	return (0);
