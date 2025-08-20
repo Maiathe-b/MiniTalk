@@ -6,50 +6,71 @@
 /*   By: jomaia <jomaia@student.42.fr>              +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/08/07 15:09:37 by jomaia            #+#    #+#             */
-/*   Updated: 2025/08/12 18:17:51 by jomaia           ###   ########.fr       */
+/*   Updated: 2025/08/20 16:51:15 by jomaia           ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
-#include "./libft/libft.h"
-#include "signal.h"
-#include "unistd.h"
-#include "stdio.h"
-#include "string.h"
+#include "minitalk.h"
 
-static void	send_signal(int pid, unsigned char chr)
+void	recieved(int sig)
+{
+	if (sig == SIGUSR2)
+	{
+		ft_printf("recieved");
+		exit (0);
+	}
+}
+
+static void	send_len(char *str, int pid)
 {
 	int	i;
-	int	test;
+	int	len;
 
-	i = 8;
-	while (i > 0)
+	len = ft_strlen(str);
+	i = 31;
+	while (i >= 0)
 	{
-		i--;
-		test = chr >> i;
-		if (test % 2 == 0)
+		if ((len >> i) & 1)
 			kill(pid, SIGUSR2);
 		else
 			kill(pid, SIGUSR1);
-		usleep(100);
+		i--;
+		usleep(1500);
+	}
+}
+
+static void	send_str(char chr, int pid)
+{
+	int	i;
+
+	i = 7;
+	while (i >= 0)
+	{
+		if ((chr >> i) & 1)
+			kill (pid, SIGUSR2);
+		else
+			kill (pid, SIGUSR1);
+		i--;
+		usleep(1500);
 	}
 }
 
 int	main(int argc, char **argv)
 {
-	int		server_pid;
-	char	*msg;
-	int		i;
+	int	pid;
 
-	i = 0;
+	signal(SIGUSR1, recieved);
+	signal(SIGUSR2, recieved);
 	if (argc != 3)
 	{
-		ft_putstr_fd("Missing PID or message", 2);
-		exit(0);
+		ft_printf("Invalid format\n Use ./client PID message\n");
+		return (0);
 	}
-	server_pid = ft_atoi(argv[1]);
-	msg = argv[2];
-	while (msg[i])
-		send_signal(server_pid, msg[i++]);
-	send_signal(server_pid, '\0');
-	return (0);
+	pid = ft_atoi(argv[1]);
+	if (pid < 1 || kill(pid, 0) == -1)
+		return (ft_printf("Invalid PID\n"), 1);
+	send_len (argv[2], pid);
+	while (*argv[2])
+		send_str(*argv[2]++, pid);
+	pause();
 }
